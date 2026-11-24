@@ -1,0 +1,208 @@
+{
+  "name": "Naver skincare keywords to Google Sheets",
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Asia/Seoul",
+    "executionTimeout": 240
+  },
+  "nodes": [
+    {
+      "id": "manual",
+      "name": "Test manually",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "daily",
+      "name": "Daily 09:00 Seoul",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        200
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 9 * * *"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "profile",
+      "name": "Watchlist input",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        0
+      ],
+      "parameters": {
+        "jsCode": "const input = {\n  \"categories\": [\n    \"스킨케어\"\n  ],\n  \"period\": \"last30days\",\n  \"maxRank\": 20,\n  \"compareWithPreviousPeriod\": true,\n  \"includeTrend\": false,\n  \"includeAudienceBreakdown\": false,\n  \"monitorChanges\": true,\n  \"minimumRankChange\": 3,\n  \"snapshotStoreName\": \"my-skincare-keywords\",\n  \"proxyConfiguration\": {\n    \"useApifyProxy\": false\n  }\n};\nreturn [{ json: input }];"
+      }
+    },
+    {
+      "id": "run",
+      "name": "Run keyword radar",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        500,
+        0
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.apify.com/v2/acts/frank_conifer_af4~naver-shopping-insight/run-sync-get-dataset-items",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "memory",
+              "value": "256"
+            },
+            {
+              "name": "timeout",
+              "value": "120"
+            },
+            {
+              "name": "maxTotalChargeUsd",
+              "value": "0.1"
+            },
+            {
+              "name": "clean",
+              "value": "true"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json }}",
+        "options": {
+          "timeout": 180000,
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "retryOnFail": false
+    },
+    {
+      "id": "rows",
+      "name": "Keyword rows only",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        760,
+        0
+      ],
+      "parameters": {
+        "jsCode": "const rows = $input.all().flatMap(({ json }) => Array.isArray(json) ? json : [json]);\nif (rows.some(row => row.status === 'error')) throw new Error('Actor returned error rows. Inspect the Apify run before retrying.');\nconst fields = [\"collectedAt\",\"categoryPath\",\"rank\",\"keyword\",\"previousRank\",\"rankChange\",\"rankTrend\",\"lastRunRank\",\"runRankChange\",\"runTrend\",\"breakoutScore\",\"breakoutSignal\",\"naverShoppingUrl\"];\nreturn rows.filter(row => row.status === 'ok' && ['keywordRank', 'beautyBreakout'].includes(row.type))\n    .map(row => ({ json: Object.fromEntries(fields.map(field => [field, row[field] ?? ''])) }));"
+      }
+    },
+    {
+      "id": "sheets",
+      "name": "Append to Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        1020,
+        0
+      ],
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_SPREADSHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Keywords",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": []
+        },
+        "options": {
+          "cellFormat": "RAW",
+          "useAppend": true
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Test manually": {
+      "main": [
+        [
+          {
+            "node": "Watchlist input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Daily 09:00 Seoul": {
+      "main": [
+        [
+          {
+            "node": "Watchlist input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Watchlist input": {
+      "main": [
+        [
+          {
+            "node": "Run keyword radar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run keyword radar": {
+      "main": [
+        [
+          {
+            "node": "Keyword rows only",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Keyword rows only": {
+      "main": [
+        [
+          {
+            "node": "Append to Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {}
+}

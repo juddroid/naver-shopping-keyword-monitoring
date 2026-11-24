@@ -1,0 +1,15 @@
+{
+  "categories": [
+    "스킨케어"
+  ],
+  "period": "last30days",
+  "maxRank": 20,
+  "compareWithPreviousPeriod": true,
+  "includeTrend": false,
+  "includeAudienceBreakdown": false,
+  "monitorChanges": false,
+  "minimumRankChange": 3,
+  "proxyConfiguration": {
+    "useApifyProxy": false
+  }
+}

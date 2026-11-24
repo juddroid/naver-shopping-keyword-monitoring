@@ -1,0 +1,6 @@
+{
+  "store": "https://apify.com/frank_conifer_af4/naver-shopping-insight",
+  "tutorial": "https://apify.com/frank_conifer_af4/naver-shopping-insight?utm_source=github&utm_medium=tutorial&utm_campaign=naver_pilot_20261124&utm_content=english_readme",
+  "koreanTutorial": "https://apify.com/frank_conifer_af4/naver-shopping-insight?utm_source=github&utm_medium=tutorial&utm_campaign=naver_pilot_20261124&utm_content=korean_readme",
+  "attributionNote": "UTM parameters identify link intent. They do not implement a click tracker or guarantee campaign-level attribution in Apify Console."
+}

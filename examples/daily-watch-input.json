@@ -1,0 +1,16 @@
+{
+  "categories": [
+    "스킨케어"
+  ],
+  "period": "last30days",
+  "maxRank": 20,
+  "compareWithPreviousPeriod": true,
+  "includeTrend": false,
+  "includeAudienceBreakdown": false,
+  "monitorChanges": true,
+  "minimumRankChange": 3,
+  "snapshotStoreName": "my-skincare-keywords",
+  "proxyConfiguration": {
+    "useApifyProxy": false
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "collectedAt": "2026-11-24T12:41:56.999Z",
+  "category": "스킨케어",
+  "periodStart": "2026-10-25",
+  "periodEnd": "2026-11-23",
+  "previousPeriod": "2026-09-25..2026-10-24",
+  "validatedResultCount": 20,
+  "publishedPreviewCount": 5,
+  "sourceUrl": "https://datalab.naver.com/shoppingInsight/sCategory.naver",
+  "collectionMethod": "Creator-owned validation run; not a customer run or earned revenue.",
+  "limitations": [
+    "Aggregated category search-keyword click rankings, not sales or absolute search volume.",
+    "Dated preview, not a live API response.",
+    "No rising movements are fabricated when ranks are unchanged."
+  ]
+}
